@@ -1,0 +1,71 @@
+# 🌿 Battery-Powered Air Quality Module
+
+### Overview
+The **Battery-Powered Air Quality Module** is an embedded system designed to continuously monitor environmental conditions and intelligently control a ventilation fan.
+Its goal is to maintain optimal air quality while preserving battery life through efficient event-driven logic and structured task management.
+
+This project emphasizes:
+- 🧠 **System logic clarity**
+- ⚙️ **Robust event handling**
+- 🔋 **Low-power operation**
+- 🌬️ **Adaptive fan control**
+
+---
+
+## 🧩 System Structure
+
+The firmware follows a modular and event-driven architecture.
+Initialization steps ensure all components are correctly configured before entering the main operational loop, where critical updates, sensor monitoring, and event handling occur.
+
+---
+
+### ⚡ Execution Flow
+
+```mermaid
+flowchart LR
+
+%% Inicio
+A([●]) --> B[Setup]
+B --> C[Configure ISR Routines]
+C --> D[Set Initial Conditions]
+D --> E[Initial Routine]
+E --> F{Infinite Loop}
+
+%% Event Handlers
+subgraph G[Event Handlers]
+direction TB
+G1{IsTimerExpired?}
+G2{isMonUpdateEventPresent?}
+G3{isDebUpdateEventPresent?}
+G4[Critical Updates]
+G5[Monitor System]
+G6[Energy System]
+G7{IsButtonChanged?}
+G8[Button Timeout]
+G9[Debug Message]
+end
+
+%% Conexiones principales
+F --> G1
+G1 --> G2
+G2 -->|Yes| G4
+G2 -->|No| G3
+G3 -->|Yes| G9
+G3 -->|No| F
+
+%% Flujo interno (mon update)
+G4 --> G5
+G5 --> G6
+G6 --> G7
+G7 -->|Yes| G8
+G7 -->|No| F
+G8 --> F
+G9 --> G7
+
+%% Estilo visual
+classDef start fill:#000,stroke:#000,stroke-width:2px,color:#fff;
+class A start;
+
+
+
+
