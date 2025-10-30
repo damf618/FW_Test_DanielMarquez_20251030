@@ -9,9 +9,3 @@ void loop()
 {
 
 }
-
-
-int myFunction(int x, int y)
-{
-
-}
