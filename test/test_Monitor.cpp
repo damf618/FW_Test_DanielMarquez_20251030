@@ -23,10 +23,15 @@
  *
 */
 
+#include <Arduino.h>
 #include "unity.h"
+#include <MonitorSystem.h>
+
+extern monitor_system_mode_t monitor_system;
 
 void setUp(void)
 {
+  MonitorSystemInit();
 }
 
 void tearDown(void)
@@ -36,6 +41,15 @@ void tearDown(void)
 // Test para modos de control del sistema de ventilacion
 void test_ControlModes(void)
 {
+    TEST_ASSERT_EQUAL_MESSAGE(true, MonitorSystemInit(),                               "Monitor System Init Failed");
+    TEST_ASSERT_EQUAL_MESSAGE(OutOfRange_M,             monitor_system.mode,           "Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(MIN_PWM_VALUE,            monitor_system.pwm_value ,     "Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(DEFAULT_INIT_TEMP,        monitor_system.temp ,          "Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(DEFAULT_HYSTERESIS,       monitor_system.hysteresis ,    "Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(DEFAULT_TEMP_RANGE_MIN,   monitor_system.temp_range_min ,"Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(DEFAULT_TEMP_RANGE_MAX,   monitor_system.temp_range_max ,"Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(LOW_PWM_VALUE,            monitor_system.pwm_min ,       "Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(HIGH_PWM_VALUE,           monitor_system.pwm_max ,       "Initial Mode parameter incorrect");
 }
 
 int runUnityTests(void) {

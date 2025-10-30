@@ -24,25 +24,10 @@ extern "C" {
 *                              Defines
 * =========================================================================== */
 
-#define MSA_ON		0xFF
-#define MSA_OFF		0x00
-
-
 
 /* ============================================================================
 *                              Data Types
 * =========================================================================== */
-
-typedef enum _msa_dio_type {
-	kDIO_Input,
-	kDIO_Output,
-	kDIO_Version,
-	kDIO_NumberOfTypes
-} msa_dio_type_e;
-
-typedef struct Version_Callback_Set_s{
-    uint8_t var;
-} Version_Callback_Set_t;
 
 
 
