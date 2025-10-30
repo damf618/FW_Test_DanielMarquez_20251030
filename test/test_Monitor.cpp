@@ -1,8 +1,8 @@
 /*
  **===== Casos de Prueba ---¡COMPLETADAS!---=====
- *
+ *  -- El sistema debe activar el modo de control de la temperatura en un rango determinado, para ahorrar bateria. [OK]
+
  **===== Casos de Prueba ---¡PENDIENTES!---=====
- *  -- El sistema debe activar el modo de control de la temperatura en un rango determinado, para ahorrar bateria.
  *  -- El sistema en caso de estar por debajo del rango determinado, debe:
  *     - Apagar el ventilador por completo.
  *     - Tener la posibilidad de entrar en modo de bajo consumo.
@@ -22,13 +22,39 @@
  *  -- El sistema debe indicar mediante un LED el valor de PWM aplicado al ventilador.
  *
 */
-
+/* ============================================================================
+*                              Includes
+* =========================================================================== */
 #include <Arduino.h>
 #include "unity.h"
 #include <MonitorSystem.h>
 
+/* ============================================================================
+*                              Data Types
+* =========================================================================== */
+typedef struct ControlModeTestCases_s
+{
+  int16_t temp;                             // Temperature to set for the test case
+  monitor_system_mode_e expected_mode;      // Mode expected after setting the temperature
+}ControlModeTestCases_t;
+
+ControlModeTestCases_t control_mode_testcases[] =
+{
+  { -50,  OutOfRange_M   },   // Below minimum temperature
+  {  80,  OutOfRange_M   },   // Above maximum temperature
+  {  20,  ControlRange_M },   // Low Limit temperature
+  {  45,  OutOfRange_M   },   // High Limit temperature
+  {  30,  ControlRange_M },   // Regular temperature
+};
+
+/* ============================================================================
+*                              Variables
+* =========================================================================== */
 extern monitor_system_mode_t monitor_system;
 
+/* ============================================================================
+*                              Testing Functions
+* =========================================================================== */
 void setUp(void)
 {
   MonitorSystemInit();
@@ -39,7 +65,7 @@ void tearDown(void)
 }
 
 // Test para modos de control del sistema de ventilacion
-void test_ControlModes(void)
+void test_MonitorInit(void)
 {
     TEST_ASSERT_EQUAL_MESSAGE(true, MonitorSystemInit(),                               "Monitor System Init Failed");
     TEST_ASSERT_EQUAL_MESSAGE(OutOfRange_M,             monitor_system.mode,           "Initial Mode parameter incorrect");
@@ -52,8 +78,25 @@ void test_ControlModes(void)
     TEST_ASSERT_EQUAL_MESSAGE(HIGH_PWM_VALUE,           monitor_system.pwm_max ,       "Initial Mode parameter incorrect");
 }
 
+
+// Test para modos de control del sistema de ventilacion
+void test_ControlModes(void)
+{
+    uint8_t n_cases = sizeof(control_mode_testcases)/sizeof(control_mode_testcases[0]);
+
+    for(uint8_t i=0;i<n_cases;i++)
+    {
+      setMonitorSystemTemp(control_mode_testcases[i].temp);
+      TEST_ASSERT_EQUAL_MESSAGE(control_mode_testcases[i].expected_mode, monitor_system.mode, "Mode Error");
+    }
+}
+
+/* ============================================================================
+*                              Test Hardware Execution
+* =========================================================================== */
 int runUnityTests(void) {
   UNITY_BEGIN();
+  RUN_TEST(test_MonitorInit);
   RUN_TEST(test_ControlModes);
   return UNITY_END();
 }

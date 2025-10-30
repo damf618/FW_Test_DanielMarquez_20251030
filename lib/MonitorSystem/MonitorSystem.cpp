@@ -29,12 +29,64 @@ monitor_system_mode_t monitor_system;
 *                              Prototypes
 * =========================================================================== */
 
-
+// Temperature range check functions
+static uint8_t isTempOutofRange(int16_t temp);
+static uint8_t isTempLow(int16_t temp);
+static uint8_t isTempHigh(int16_t temp);
+static void setControlModeByTemp(int16_t temp);
 
 /* ============================================================================
-*                              Definitions
+*                              Private Definitions
 * =========================================================================== */
 
+static uint8_t isTempOutofRange(int16_t temp)
+{
+    uint8_t rtn = false;
+
+    if(temp < monitor_system.temp_range_min || temp > monitor_system.temp_range_max)
+    {
+        rtn = true;
+    }
+    return rtn;
+}
+
+static uint8_t isTempLow(int16_t temp)
+{
+    uint8_t rtn = false;
+
+    if(temp < monitor_system.temp_range_min)
+    {
+        rtn = true;
+    }
+    return rtn;
+}
+
+static uint8_t isTempHigh(int16_t temp)
+{
+    uint8_t rtn = false;
+
+    if(temp >= monitor_system.temp_range_max)
+    {
+        rtn = true;
+    }
+    return rtn;
+}
+
+static void setControlModeByTemp(int16_t temp)
+{
+    if(isTempOutofRange(temp))
+    {
+        monitor_system.mode = OutOfRange_M;
+    }
+    else
+    {
+        monitor_system.mode = ControlRange_M;
+    }
+}
+
+/* ============================================================================
+*                              Public Definitions
+* =========================================================================== */
 
 uint8_t MonitorSystemInit(void)
 {
@@ -49,4 +101,19 @@ uint8_t MonitorSystemInit(void)
     return true;
 }
 
+uint8_t setMonitorSystemTemp(int16_t temp)
+{
+    uint8_t rtn = false;
+    if(temp < MIN_TEMP_VALUE || temp > MAX_TEMP_VALUE)
+    {
+        monitor_system.temp = temp;
+        rtn =true;
+    }
+    return rtn;
+}
+
+void MonitorSystemUpdate(void)
+{
+    setControlModeByTemp(monitor_system.temp);
+}
 

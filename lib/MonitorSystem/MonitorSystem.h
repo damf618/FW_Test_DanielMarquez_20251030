@@ -28,6 +28,9 @@ extern "C" {
 *                              Defines
 * =========================================================================== */
 
+#define MIN_TEMP_VALUE          -40
+#define MAX_TEMP_VALUE          70
+
 #define MAX_PWM_VALUE           100
 #define MIN_PWM_VALUE           0
 #define DEFAULT_TEMP_RANGE_MIN  20  // degrees Celsius
@@ -45,8 +48,15 @@ typedef enum monitor_system_mode {
 	OutOfRange_M=0,
 	ControlRange_M,
     Manual_M,
-	kDIO_NumberOfTypes
+	kNumberOfModes
 } monitor_system_mode_e;
+
+typedef enum ms_temp_modes {
+	LOW_T=0,
+	REGULAR_T,
+    HIGH_T,
+	kNumberOfTempModes
+} ms_temp_modes_e;
 
 typedef struct monitor_system_control {
 	monitor_system_mode_e mode;
@@ -66,10 +76,21 @@ typedef struct monitor_system_control {
 
 /***
  * \brief Inits the monitor system structure and related hardware.
- * \return 0 if OK, other value if error.
+ * \return true if OK, otherwise false if error.
  */
 uint8_t MonitorSystemInit(void);
 
+/***
+ * \brief Updates the monitor system status based on current temperature readings.
+ */
+void MonitorSystemUpdate(void);
+
+/***
+ * \brief Sets the current temperature in the monitor system.
+ * \param temp The current temperature to set.
+ * \return true if OK, otherwise false if error.
+ */
+uint8_t setMonitorSystemTemp(int16_t temp);
 
  // Si se compila como C++
 #ifdef __cplusplus
