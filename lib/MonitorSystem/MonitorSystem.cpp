@@ -43,7 +43,7 @@ static uint8_t isTempOutofRange(int16_t temp)
 {
     uint8_t rtn = false;
 
-    if(temp < monitor_system.temp_range_min || temp > monitor_system.temp_range_max)
+    if(temp < monitor_system.temp_range_min || temp >= monitor_system.temp_range_max)
     {
         rtn = true;
     }
@@ -104,7 +104,7 @@ uint8_t MonitorSystemInit(void)
 uint8_t setMonitorSystemTemp(int16_t temp)
 {
     uint8_t rtn = false;
-    if(temp < MIN_TEMP_VALUE || temp > MAX_TEMP_VALUE)
+    if(temp > MIN_TEMP_VALUE || temp < MAX_TEMP_VALUE)
     {
         monitor_system.temp = temp;
         rtn =true;
@@ -114,6 +114,46 @@ uint8_t setMonitorSystemTemp(int16_t temp)
 
 void MonitorSystemUpdate(void)
 {
-    setControlModeByTemp(monitor_system.temp);
+    if(monitor_system.mode != Manual_M)
+    {
+        setControlModeByTemp(monitor_system.temp);
+    }
+
+    switch(monitor_system.mode)
+    {
+        case OutOfRange_M:
+            //Execute out of range actions
+            if(isTempLow(monitor_system.temp))
+            {
+                monitor_system.pwm_value = MIN_PWM_VALUE;
+            }
+            else if(isTempHigh(monitor_system.temp))
+            {
+                monitor_system.pwm_value = MAX_PWM_VALUE;
+            }
+            break;
+        case ControlRange_M:
+            // Simple linear control between min and max PWM based on temperature
+            break;
+        case Manual_M:
+            // In manual mode, PWM value is set to MAX value
+            monitor_system.pwm_value = MAX_PWM_VALUE;
+            break;
+        default:
+            // Unknown mode, set PWM to minimum as a safe fallback
+            monitor_system.pwm_value = MIN_PWM_VALUE;
+            monitor_system.mode = OutOfRange_M;
+            break;
+    }
+    //TODO: Update PWM output here based on monitor_system.pwm_value throuh HAL APIs
 }
 
+void clearMonitorSystemManualMode(void)
+{
+    monitor_system.mode = OutOfRange_M;
+}
+
+void setMonitorSystemManualMode(void)
+{
+    monitor_system.mode = Manual_M;
+}

@@ -92,6 +92,16 @@ void MonitorSystemUpdate(void);
  */
 uint8_t setMonitorSystemTemp(int16_t temp);
 
+/***
+ * \brief Sets the monitor system to manual mode.
+ */
+void setMonitorSystemManualMode(void);
+
+/***
+ * \brief Clear the monitor system to "Out of Range" Mode.
+ */
+void clearMonitorSystemManualMode(void);
+
  // Si se compila como C++
 #ifdef __cplusplus
 } // fin de extern "C"
