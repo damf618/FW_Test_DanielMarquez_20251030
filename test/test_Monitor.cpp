@@ -1,25 +1,31 @@
 /*
  **===== Casos de Prueba ---¡COMPLETADAS!---=====
  *  -- El sistema debe activar el modo de control de la temperatura en un rango determinado, para ahorrar bateria. [OK]
+ *  -- El sistema en caso de estar por debajo del rango determinado, debe:
+ *     - Apagar el ventilador por completo.                                                                        [OK]
+ *     - Tener la posibilidad de entrar en modo de bajo consumo.                                                   [OK]
+ *  -- El sistema debe tener la posibilidad de configurar:
+ *     - Valor minimo de PWM para el ventilador, una vez que la temperatura se encuentra en el rango de control.   [OK]
+ *     - Valor maximo de PWM para el ventilador, una vez que la temperatura se encuentra en el rango de control.   [OK]
+ *     - Rango de temperatura para el control del ventilador.                                                      [OK]
+ *     - Intervalo de tiempo para la lectura de la temperatura y actualizacion del PWM.                            [OK]
+ *     - Modo de control: Manual o Automatico.                                                                     [OK]
+ *  -- El sistema al sobrepasar el rango de temperatura debe:
+ *     - Activar el ventilador al 100% de su capacidad.                                                            [OK]
+ *     - Tener la posibilidad de entrar en modo de alto consumo.                                                   [OK]
+
 
  **===== Casos de Prueba ---¡PENDIENTES!---=====
- *  -- El sistema en caso de estar por debajo del rango determinado, debe:
- *     - Apagar el ventilador por completo.
- *     - Tener la posibilidad de entrar en modo de bajo consumo.
+
  *  -- El sistema debe indicar mediante el puerto serie mensajes que permitan identificar:
- *     - El modo de trabajo según la temperatura.
- *     - La temperatura medida.
- *     - El Duty Cycle aplicado al ventilador.
+ *     - El modo de trabajo según la temperatura.                                                                  [PENDING]
+ *     - La temperatura medida.                                                                                    [PENDING]
+ *     - El Duty Cycle aplicado al ventilador.                                                                     [PENDING]
  *  -- El sistema debe tener la posibilidad de configurar:
- *     - Valor minimo de PWM para el ventilador, una vez que la temperatura se encuentra en el rango de control.
- *     - Valor maximo de PWM para el ventilador, una vez que la temperatura se encuentra en el rango de control.
- *     - Rango de temperatura para el control del ventilador.
- *     - Histeresis para evitar oscilaciones continuas del ventilador.
- *     - Intervalo de tiempo para la lectura de la temperatura y actualizacion del PWM.
- *     - Modo de control: Manual o Automatico.
+ *     - Histeresis para evitar oscilaciones continuas del ventilador.                                             [PENDING]
  *  -- El sistema al sobrepasar el rango de temperatura debe:
- *     - Activar el ventilador al 100% de su capacidad.
- *  -- El sistema debe indicar mediante un LED el valor de PWM aplicado al ventilador.
+ *  -- El sistema debe indicar mediante un LED el valor de PWM aplicado al ventilador.                             [PENDING]
+ *     (A considerar en el Hardware o en su defecto una salida PWM sincronizada con el valor aplicado al ventilador).
  *
 */
 /* ============================================================================
@@ -42,8 +48,8 @@ ControlModeTestCases_t control_mode_testcases[] =
 {
   { -50,  OutOfRange_M   },   // Below minimum temperature
   {  80,  OutOfRange_M   },   // Above maximum temperature
-  //{  20,  ControlRange_M },   // Low Limit temperature
-  //{  45,  OutOfRange_M   },   // High Limit temperature
+  {  20,  ControlRange_M },   // Low Limit temperature
+  {  45,  OutOfRange_M   },   // High Limit temperature
   {  30,  ControlRange_M },   // Regular temperature
 };
 
@@ -76,6 +82,8 @@ void test_MonitorInit(void)
     TEST_ASSERT_EQUAL_MESSAGE(DEFAULT_TEMP_RANGE_MAX,   monitor_system.temp_range_max ,"Initial Mode parameter incorrect");
     TEST_ASSERT_EQUAL_MESSAGE(LOW_PWM_VALUE,            monitor_system.pwm_min ,       "Initial Mode parameter incorrect");
     TEST_ASSERT_EQUAL_MESSAGE(HIGH_PWM_VALUE,           monitor_system.pwm_max ,       "Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(0,                        monitor_system.timer_counter , "Initial Mode parameter incorrect");
+    TEST_ASSERT_EQUAL_MESSAGE(UPDATE_EVENT_TIMER_GOAL,  monitor_system.timer_goal ,    "Initial Mode parameter incorrect");
 }
 
 

@@ -39,6 +39,7 @@ extern "C" {
 #define DEFAULT_INIT_TEMP       0   // Grados Celsius
 #define HIGH_PWM_VALUE          80  // MAX Output PWM when in control range
 #define LOW_PWM_VALUE           20  // MIN Output PWM when in control range
+#define UPDATE_EVENT_TIMER_GOAL 20  // Counter set to 100 ms for each update event (i.e., 20 * 100ms = 2s)
 
 /* ============================================================================
 *                              Data Types
@@ -60,13 +61,15 @@ typedef enum ms_temp_modes {
 
 typedef struct monitor_system_control {
 	monitor_system_mode_e mode;
-    uint8_t pwm_value;
-    int16_t temp;
-    uint8_t hysteresis;
-    uint8_t temp_range_min;
-    uint8_t temp_range_max;
-    uint8_t pwm_min;
-    uint8_t pwm_max;
+    uint8_t  pwm_value;
+    int16_t  temp;
+    uint8_t  hysteresis;
+    uint8_t  temp_range_min;
+    uint8_t  temp_range_max;
+    uint8_t  pwm_min;
+    uint8_t  pwm_max;
+    uint16_t timer_counter;
+    uint16_t timer_goal;
 } monitor_system_mode_t;
 
 

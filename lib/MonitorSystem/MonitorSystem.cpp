@@ -98,6 +98,8 @@ uint8_t MonitorSystemInit(void)
     monitor_system.temp_range_max   = DEFAULT_TEMP_RANGE_MAX;
     monitor_system.pwm_min          = LOW_PWM_VALUE;
     monitor_system.pwm_max          = HIGH_PWM_VALUE;
+    monitor_system.timer_goal       = UPDATE_EVENT_TIMER_GOAL;
+    monitor_system.timer_counter    = 0;
     return true;
 }
 
@@ -126,18 +128,22 @@ void MonitorSystemUpdate(void)
             if(isTempLow(monitor_system.temp))
             {
                 monitor_system.pwm_value = MIN_PWM_VALUE;
+                //TODO: Set Energy Mode as High Consumption
             }
             else if(isTempHigh(monitor_system.temp))
             {
                 monitor_system.pwm_value = MAX_PWM_VALUE;
+                //TODO: Set Energy Mode as High Consumption
             }
             break;
         case ControlRange_M:
             // Simple linear control between min and max PWM based on temperature
+            //TODO: Set Energy Mode as Regular Consumption
             break;
         case Manual_M:
             // In manual mode, PWM value is set to MAX value
             monitor_system.pwm_value = MAX_PWM_VALUE;
+            //TODO: Set Energy Mode as High Consumption
             break;
         default:
             // Unknown mode, set PWM to minimum as a safe fallback
