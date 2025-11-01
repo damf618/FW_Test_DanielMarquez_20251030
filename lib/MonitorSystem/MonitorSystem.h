@@ -61,7 +61,7 @@ typedef enum ms_temp_modes {
 	kNumberOfTempModes
 } ms_temp_modes_e;
 
-typedef struct monitor_system_control {
+typedef struct monitor_system_control_s {
 	monitor_system_mode_e mode;
     uint8_t  pwm_value;
     int16_t  temp;

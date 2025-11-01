@@ -126,6 +126,7 @@ uint8_t MonitorSystemInit(void)
     monitor_system.pwm_max          = HIGH_PWM_VALUE;
     monitor_system.timer_goal       = UPDATE_EVENT_TIMER_GOAL;
     monitor_system.timer_counter    = 0;
+    //TODO: We could verify here the initialization of related hardware components (e.g., PWM modules, temperature sensors, etc.)
     return true;
 }
 
