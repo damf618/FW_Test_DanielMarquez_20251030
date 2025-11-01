@@ -41,6 +41,8 @@ extern "C" {
 #define LOW_PWM_VALUE           20  // MIN Output PWM when in control range
 #define UPDATE_EVENT_TIMER_GOAL 20  // Counter set to 100 ms for each update event (i.e., 20 * 100ms = 2s)
 
+#define PWM_LINEAR_SLOPE        3
+#define PWM_LINEAR_ADJUST       -38
 /* ============================================================================
 *                              Data Types
 * =========================================================================== */

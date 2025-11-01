@@ -26,6 +26,7 @@
  *  -- El sistema al sobrepasar el rango de temperatura debe:
  *  -- El sistema debe indicar mediante un LED el valor de PWM aplicado al ventilador.                             [PENDING]
  *     (A considerar en el Hardware o en su defecto una salida PWM sincronizada con el valor aplicado al ventilador).
+ *  -- Incluir el sistema de control del ventilador en base al esquema dispuesto de control.                       [PENDING]
  *
 */
 /* ============================================================================
@@ -44,6 +45,18 @@ typedef struct ControlModeTestCases_s
   monitor_system_mode_e expected_mode;      // Mode expected after setting the temperature
 }ControlModeTestCases_t;
 
+typedef struct ControlFanPWMTestCases_s
+{
+  int16_t temp;                             // Temperature to set for the test case
+  monitor_system_mode_e expected_mode;      // Mode expected after setting the temperature
+  uint8_t expected_pwm;                     // PWM expected after setting the temperature
+}ControlFanPWMTestCases_t;
+
+/* ============================================================================
+*                              Variables
+* =========================================================================== */
+extern monitor_system_mode_t monitor_system;
+
 ControlModeTestCases_t control_mode_testcases[] =
 {
   { -50,  OutOfRange_M   },   // Below minimum temperature
@@ -53,10 +66,18 @@ ControlModeTestCases_t control_mode_testcases[] =
   {  30,  ControlRange_M },   // Regular temperature
 };
 
-/* ============================================================================
-*                              Variables
-* =========================================================================== */
-extern monitor_system_mode_t monitor_system;
+ControlFanPWMTestCases_t control_fan_pwm_testcases[] =
+{
+  { -50,  OutOfRange_M,   MIN_PWM_VALUE },   // Below minimum temperature
+  {  80,  OutOfRange_M,   MAX_PWM_VALUE },   // Above maximum temperature
+  {  20,  ControlRange_M, LOW_PWM_VALUE },   // Low Limit temperature
+  {  45,  OutOfRange_M,   MAX_PWM_VALUE},    // High Limit temperature
+  {  25,  ControlRange_M, 37 },              // Regular temperature
+  {  30,  ControlRange_M, 52 },              // Regular temperature
+  {  40,  ControlRange_M, HIGH_PWM_VALUE },  // Regular temperature
+  {  44,  ControlRange_M, HIGH_PWM_VALUE },  // Regular temperature
+};
+
 
 /* ============================================================================
 *                              Testing Functions
@@ -90,16 +111,16 @@ void test_MonitorInit(void)
 // Test para modos de control del sistema de ventilacion
 void test_ControlModes(void)
 {
-    uint8_t n_cases = sizeof(control_mode_testcases)/sizeof(control_mode_testcases[0]);
-    char Text_ID[50];
+  uint8_t n_cases = sizeof(control_mode_testcases)/sizeof(control_mode_testcases[0]);
+  char Text_ID[50];
 
-    for(uint8_t i=0;i<n_cases;i++)
-    {
-      sprintf(Text_ID,"Error en caso de Prueba Nro: %d",i);
-      TEST_ASSERT_EQUAL_MESSAGE(true,setMonitorSystemTemp(control_mode_testcases[i].temp),"Temp Out of Range");
-      MonitorSystemUpdate();
-      TEST_ASSERT_EQUAL_MESSAGE(control_mode_testcases[i].expected_mode, monitor_system.mode, Text_ID);
-    }
+  for(uint8_t i=0;i<n_cases;i++)
+  {
+    sprintf(Text_ID,"Error en caso de Prueba Nro: %d",i);
+    TEST_ASSERT_EQUAL_MESSAGE(true,setMonitorSystemTemp(control_mode_testcases[i].temp),"Temp Out of Range");
+    MonitorSystemUpdate();
+    TEST_ASSERT_EQUAL_MESSAGE(control_mode_testcases[i].expected_mode, monitor_system.mode, Text_ID);
+  }
 }
 
 // Test para validar el modo manual
@@ -139,6 +160,24 @@ void test_LowTemperature(void)
   TEST_ASSERT_EQUAL_MESSAGE(MIN_PWM_VALUE, monitor_system.pwm_value, "PWM Value incorrect for Low Temp");
 }
 
+// Test para el control de los ventiladores del sistema
+void test_FanControlCurve(void)
+{
+  uint8_t n_cases = sizeof(control_fan_pwm_testcases)/sizeof(control_fan_pwm_testcases[0]);
+  char Text_ID[50];
+
+  for(uint8_t i=0;i<n_cases;i++)
+  {
+    sprintf(Text_ID,"MODE: Error en caso de Prueba Nro: %d",i);
+    // Set Temp Regular to test PWM controlled values
+    TEST_ASSERT_EQUAL_MESSAGE(true,setMonitorSystemTemp(control_fan_pwm_testcases[i].temp),         "Temp Out of Range");
+    MonitorSystemUpdate();
+    TEST_ASSERT_EQUAL_MESSAGE(control_fan_pwm_testcases[i].expected_mode, monitor_system.mode,      Text_ID);
+    sprintf(Text_ID,"PWM: Error en caso de Prueba Nro: %d",i);
+    TEST_ASSERT_EQUAL_MESSAGE(control_fan_pwm_testcases[i].expected_pwm,  monitor_system.pwm_value, Text_ID);
+  }
+}
+
 /* ============================================================================
 *                              Test Hardware Execution
 * =========================================================================== */
@@ -149,6 +188,7 @@ int runUnityTests(void) {
   RUN_TEST(test_ManualMode);
   RUN_TEST(test_HighTemperature);
   RUN_TEST(test_LowTemperature);
+  RUN_TEST(test_FanControlCurve);
   return UNITY_END();
 }
 

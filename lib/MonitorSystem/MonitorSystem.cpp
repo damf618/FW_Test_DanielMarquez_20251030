@@ -84,6 +84,32 @@ static void setControlModeByTemp(int16_t temp)
     }
 }
 
+static void LinearControlPWMLogic(void)
+{
+    // Simple linear interpolation between low and high PWM based on temperature
+    if(monitor_system.temp <= monitor_system.temp_range_min)
+    {
+        monitor_system.pwm_value = monitor_system.pwm_min;
+    }
+    else if(monitor_system.temp >= monitor_system.temp_range_max)
+    {
+        monitor_system.pwm_value = monitor_system.pwm_max;
+    }
+    else
+    {
+        // Linear interpolation
+        monitor_system.pwm_value = monitor_system.temp * PWM_LINEAR_SLOPE + PWM_LINEAR_ADJUST;
+    }
+    if(monitor_system.pwm_value < monitor_system.pwm_min)
+    {
+        monitor_system.pwm_value = monitor_system.pwm_min;
+    }
+    else if(monitor_system.pwm_value > monitor_system.pwm_max)
+    {
+        monitor_system.pwm_value = monitor_system.pwm_max;
+    }
+}
+
 /* ============================================================================
 *                              Public Definitions
 * =========================================================================== */
@@ -139,6 +165,7 @@ void MonitorSystemUpdate(void)
         case ControlRange_M:
             // Simple linear control between min and max PWM based on temperature
             //TODO: Set Energy Mode as Regular Consumption
+            LinearControlPWMLogic();
             break;
         case Manual_M:
             // In manual mode, PWM value is set to MAX value
